@@ -12,7 +12,7 @@ setup_db(app)
 CORS(app)
 
 '''
-@TODO uncomment the following line to initialize the datbase
+uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
@@ -20,7 +20,6 @@ CORS(app)
 
 # ROUTES
 '''
-@TODO implement endpoint
     GET /drinks
         it should be a public endpoint
         it should contain only the drink.short() data representation
@@ -48,7 +47,6 @@ def get_drinks():
 
 
 '''
-@TODO implement endpoint
     GET /drinks-detail
         it should require the 'get:drinks-detail' permission
         it should contain the drink.long() data representation
@@ -56,6 +54,7 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=['GET'])
+@requires_auth('get:drinks-detail')
 def get_drinks_detail():
     try:
         drinks_query = Drink.query.all()
@@ -74,7 +73,6 @@ def get_drinks_detail():
 
 
 '''
-@TODO implement endpoint
     POST /drinks
         it should create a new row in the drinks table
         it should require the 'post:drinks' permission
@@ -83,6 +81,7 @@ def get_drinks_detail():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/create', methods=['POST'])
+@requires_auth('post:drinks')
 def create_drink():
     try:
         drink = request.get_json()
@@ -106,7 +105,6 @@ def create_drink():
 
 
 '''
-@TODO implement endpoint
     PATCH /drinks/<id>
         where <id> is the existing model id
         it should respond with a 404 error if <id> is not found
@@ -117,6 +115,7 @@ def create_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
 def edit_drink(drink_id):
     try:
         drink = Drink.query.get(drink_id)
@@ -138,7 +137,6 @@ def edit_drink(drink_id):
 
 
 '''
-@TODO implement endpoint
     DELETE /drinks/<id>
         where <id> is the existing model id
         it should respond with a 404 error if <id> is not found
@@ -148,6 +146,7 @@ def edit_drink(drink_id):
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/delete/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
 def delete_drink(drink_id):
     try:
         drink = Drink.query.get(drink_id)
@@ -179,7 +178,7 @@ def unprocessable(error):
 
 
 '''
-@TODO implement error handlers using the @app.errorhandler(error) decorator
+implement error handlers using the @app.errorhandler(error) decorator
     each error handler should return (with approprate messages):
              jsonify({
                     "success": False,
@@ -190,7 +189,7 @@ def unprocessable(error):
 '''
 
 '''
-@TODO implement error handler for 404
+implement error handler for 404
     error handler should conform to general task above
 '''
 @app.errorhandler(404)
@@ -203,7 +202,7 @@ def not_found(error):
 
 
 '''
-@TODO implement error handler for AuthError
+implement error handler for AuthError
     error handler should conform to general task above
 '''
 @app.errorhandler(403)
