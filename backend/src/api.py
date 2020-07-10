@@ -116,6 +116,25 @@ def create_drink():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
+def edit_drink(drink_id):
+    try:
+        drink = Drink.query.get(drink_id)
+        drink_details = request.get_json()
+        drink.title = drink_details['title']
+        drink.recipe = json.dumps(drink_details['recipe'])
+        drink.update()
+        return jsonify({
+            'success': True,
+            'code': 200,
+            'drinks': [drink.long()],
+        })
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        abort(404)
+    finally:
+        db.session.close()
 
 
 '''
@@ -128,6 +147,22 @@ def create_drink():
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/delete/<int:drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+    try:
+        drink = Drink.query.get(drink_id)
+        drink.delete()
+        return jsonify({
+            'success': True,
+            'code': 200,
+            'delete': drink_id,
+        })
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        abort(404)
+    finally:
+        db.session.close()
 
 
 # Error Handling

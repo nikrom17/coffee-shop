@@ -112,7 +112,7 @@ export class DrinksService {
     if (drink.id >= 0) {
       // patch
       this.http
-        .patch(this.url + "/drinks/edit" + drink.id, drink, this.getHeaders())
+        .patch(this.url + "/drinks/edit/" + drink.id, drink, this.getHeaders())
         .subscribe((res: any) => {
           if (res.success) {
             this.drinksToItems(res.drinks);
@@ -133,7 +133,7 @@ export class DrinksService {
   deleteDrink(drink: Drink) {
     delete this.items[drink.id];
     this.http
-      .delete(this.url + "/drinks/" + drink.id, this.getHeaders())
+      .delete(this.url + "/drinks/delete/" + drink.id, this.getHeaders())
       .subscribe((res: any) => {});
   }
 
