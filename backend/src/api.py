@@ -85,9 +85,10 @@ def get_drinks_detail():
 @app.route('/drinks/create', methods=['POST'])
 def create_drink():
     try:
-        title = request.args.get('title')
-        recipe = request.args.get('recipe')
-        drink = Drink(title=title, recipe=recipe)
+        drink = request.get_json()
+        title = drink['title']
+        recipe = drink['recipe']
+        drink = Drink(title=title, recipe=json.dumps(recipe))
         drink.insert()
         drinks_query = Drink.query.all()
         drinks = [drink.short() for drink in drinks_query]
