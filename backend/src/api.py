@@ -97,12 +97,14 @@ def create_drink(payload):
 @app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def edit_drink(payload, drink_id,):
+    drink_details = request.get_json()
     drink = Drink.query.get(drink_id)
     if not drink:
         abort(404)
-    drink_details = request.get_json()
-    drink.title = drink_details['title']
-    drink.recipe = json.dumps(drink_details['recipe'])
+    if drink_details['title']:
+        drink.title = drink_details['title']
+    if drink_details['recipe']:
+        drink.recipe = json.dumps(drink_details['recipe'])
     drink.update()
     return jsonify({
         'success': True,
