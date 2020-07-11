@@ -81,11 +81,12 @@ implement check_permissions(permission, payload) method
 
 
 def check_permissions(permission, payload):
-    if 'permissions' not in payload:
-        abort(400, 'Permissions not included in JWT.')
+    if permission:
+        if 'permissions' not in payload:
+            abort(400, 'Permissions not included in JWT.')
 
-    if permission not in payload['permissions']:
-        abort(401, 'Permission not found.')  # or 403
+        if permission not in payload['permissions']:
+            abort(401, 'Permission not found.')  # or 403
     return True
 
 

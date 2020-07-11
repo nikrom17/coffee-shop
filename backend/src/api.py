@@ -29,6 +29,7 @@ uncomment the following line to initialize the datbase
 
 
 @app.route('/drinks', methods=['GET'])
+@requires_auth('')
 def get_drinks(payload):
     drinks_query = Drink.query.all()
     drinks = [drink.short() for drink in drinks_query]
@@ -95,8 +96,10 @@ def create_drink(payload):
 '''
 @app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(drink_id, payload):
+def edit_drink(payload, drink_id,):
     drink = Drink.query.get(drink_id)
+    if not drink:
+        abort(404)
     drink_details = request.get_json()
     drink.title = drink_details['title']
     drink.recipe = json.dumps(drink_details['recipe'])
@@ -119,8 +122,10 @@ def edit_drink(drink_id, payload):
 '''
 @app.route('/drinks/delete/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(drink_id, payload):
+def delete_drink(payload, drink_id):
     drink = Drink.query.get(drink_id)
+    if not drink:
+        abort(404)
     drink.delete()
     return jsonify({
         'success': True,
