@@ -30,20 +30,13 @@ uncomment the following line to initialize the datbase
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    try:
-        drinks_query = Drink.query.all()
-        drinks = [drink.short() for drink in drinks_query]
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'drinks': drinks,
-        })
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        abort(500)
-    finally:
-        db.session.close()
+    drinks_query = Drink.query.all()
+    drinks = [drink.short() for drink in drinks_query]
+    return jsonify({
+        'success': True,
+        'code': 200,
+        'drinks': drinks,
+    })
 
 
 '''
@@ -56,20 +49,13 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_detail():
-    try:
-        drinks_query = Drink.query.all()
-        drinks = [drink.long() for drink in drinks_query]
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'drinks': drinks,
-        })
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        abort(500)
-    finally:
-        db.session.close()
+    drinks_query = Drink.query.all()
+    drinks = [drink.long() for drink in drinks_query]
+    return jsonify({
+        'success': True,
+        'code': 200,
+        'drinks': drinks,
+    })
 
 
 '''
@@ -83,25 +69,18 @@ def get_drinks_detail():
 @app.route('/drinks/create', methods=['POST'])
 @requires_auth('post:drinks')
 def create_drink():
-    try:
-        drink = request.get_json()
-        title = drink['title']
-        recipe = drink['recipe']
-        drink = Drink(title=title, recipe=json.dumps(recipe))
-        drink.insert()
-        drinks_query = Drink.query.all()
-        drinks = [drink.short() for drink in drinks_query]
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'drinks': drinks,
-        })
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        abort(500)
-    finally:
-        db.session.close()
+    drink = request.get_json()
+    title = drink['title']
+    recipe = drink['recipe']
+    drink = Drink(title=title, recipe=json.dumps(recipe))
+    drink.insert()
+    drinks_query = Drink.query.all()
+    drinks = [drink.short() for drink in drinks_query]
+    return jsonify({
+        'success': True,
+        'code': 200,
+        'drinks': drinks,
+    })
 
 
 '''
@@ -117,23 +96,16 @@ def create_drink():
 @app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def edit_drink(drink_id):
-    try:
-        drink = Drink.query.get(drink_id)
-        drink_details = request.get_json()
-        drink.title = drink_details['title']
-        drink.recipe = json.dumps(drink_details['recipe'])
-        drink.update()
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'drinks': [drink.long()],
-        })
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        abort(404)
-    finally:
-        db.session.close()
+    drink = Drink.query.get(drink_id)
+    drink_details = request.get_json()
+    drink.title = drink_details['title']
+    drink.recipe = json.dumps(drink_details['recipe'])
+    drink.update()
+    return jsonify({
+        'success': True,
+        'code': 200,
+        'drinks': [drink.long()],
+    })
 
 
 '''
@@ -148,20 +120,13 @@ def edit_drink(drink_id):
 @app.route('/drinks/delete/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(drink_id):
-    try:
-        drink = Drink.query.get(drink_id)
-        drink.delete()
-        return jsonify({
-            'success': True,
-            'code': 200,
-            'delete': drink_id,
-        })
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-        abort(404)
-    finally:
-        db.session.close()
+    drink = Drink.query.get(drink_id)
+    drink.delete()
+    return jsonify({
+        'success': True,
+        'code': 200,
+        'delete': drink_id,
+    })
 
 
 # Error Handling
@@ -212,3 +177,21 @@ def forbidden(error):
         "error": 403,
         "message": "resource forbidden"
     }), 403
+
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "success": False,
+        "error": 400,
+        "message": error.description
+    }), 400
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": error.description
+    }), 401

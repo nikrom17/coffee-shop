@@ -1,5 +1,5 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -82,16 +82,10 @@ implement check_permissions(permission, payload) method
 
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
-        raise AuthError({
-            'code': 'invalid_claims',
-            'description': 'Permissions not included in JWT.'
-        }, 400)
+        abort(400, 'Permissions not included in JWT.')
 
     if permission not in payload['permissions']:
-        raise AuthError({
-            'code': 'unauthorized',
-            'description': 'Permission not found.'
-        }, 403)
+        abort(401, 'Permission not found.')  # or 403
     return True
 
 
@@ -116,10 +110,7 @@ def verify_decode_jwt(token):
     unverified_header = jwt.get_unverified_header(token)
     rsa_key = {}
     if 'kid' not in unverified_header:
-        raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Authorization malformed.'
-        }, 401)
+        abort(401, 'Authorization malformed.')
 
     for key in jwks['keys']:
         if key['kid'] == unverified_header['kid']:
@@ -143,25 +134,12 @@ def verify_decode_jwt(token):
             return payload
 
         except jwt.ExpiredSignatureError:
-            raise AuthError({
-                'code': 'token_expired',
-                'description': 'Token expired.'
-            }, 401)
-
+            abort(401, 'Token expired.')
         except jwt.JWTClaimsError:
-            raise AuthError({
-                'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please, check the audience and issuer.'
-            }, 401)
+            abort(401, 'Incorrect claims. Please, check the audience and issuer.')
         except Exception:
-            raise AuthError({
-                'code': 'invalid_header',
-                'description': 'Unable to parse authentication token.'
-            }, 400)
-    raise AuthError({
-        'code': 'invalid_header',
-                'description': 'Unable to find the appropriate key.'
-    }, 400)
+            abort(400, 'Unable to parse authentication token.')
+    abort(400, 'Unable to find the appropriate key.')
 
 
 '''
