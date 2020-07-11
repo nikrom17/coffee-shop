@@ -29,7 +29,7 @@ uncomment the following line to initialize the datbase
 
 
 @app.route('/drinks', methods=['GET'])
-def get_drinks():
+def get_drinks(payload):
     drinks_query = Drink.query.all()
     drinks = [drink.short() for drink in drinks_query]
     return jsonify({
@@ -48,7 +48,7 @@ def get_drinks():
 '''
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+def get_drinks_detail(payload):
     drinks_query = Drink.query.all()
     drinks = [drink.long() for drink in drinks_query]
     return jsonify({
@@ -68,7 +68,7 @@ def get_drinks_detail():
 '''
 @app.route('/drinks/create', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink():
+def create_drink(payload):
     drink = request.get_json()
     title = drink['title']
     recipe = drink['recipe']
@@ -95,7 +95,7 @@ def create_drink():
 '''
 @app.route('/drinks/edit/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(drink_id):
+def edit_drink(drink_id, payload):
     drink = Drink.query.get(drink_id)
     drink_details = request.get_json()
     drink.title = drink_details['title']
@@ -119,7 +119,7 @@ def edit_drink(drink_id):
 '''
 @app.route('/drinks/delete/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(drink_id):
+def delete_drink(drink_id, payload):
     drink = Drink.query.get(drink_id)
     drink.delete()
     return jsonify({
